@@ -22,7 +22,12 @@ class _CardState extends State<Card> {
         child: Row(
           children: [
             Padding(padding: EdgeInsets.all(6.0)),
-            IconButton(onPressed: () {}, icon: Icon(Icons.check_box)),
+            Checkbox(
+              value: false,
+              onChanged: (value) {
+                // Handle checkbox state change
+              },
+            ),
             SizedBox(width: 16),
             Text(
               'Task Title',

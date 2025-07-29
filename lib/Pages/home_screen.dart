@@ -56,8 +56,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         final task = tasks[index];
                         return Card(
                           child: ListTile(
-                            title: Text(task.title),
-                            subtitle: Text(task.description),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            title: Text(
+                              task.title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                decoration: task.isCompleted
+                                    ? TextDecoration.lineThrough
+                                    : TextDecoration.none,
+                              ),
+                            ),
+                            subtitle: task.description.isNotEmpty
+                                ? Text(task.description)
+                                : null,
                             trailing: IconButton(
                               icon: Icon(Icons.delete),
                               onPressed: () => removeTask(index),
