@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_list_app/Components/Card.dart';
 import 'package:to_do_list_app/Components/taks.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -54,38 +55,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   : ListView.builder(
                       itemBuilder: (context, index) {
                         final task = tasks[index];
-                        return Card(
-                          child: ListTile(
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            title: Text(
-                              task.title,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                decoration: task.isCompleted
-                                    ? TextDecoration.lineThrough
-                                    : TextDecoration.none,
-                              ),
-                            ),
-                            subtitle: task.description.isNotEmpty
-                                ? Text(task.description)
-                                : null,
-                            trailing: IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () => removeTask(index),
-                            ),
-                            leading: Checkbox(
-                              value: task.isCompleted,
-                              onChanged: (value) {
-                                setState(() {
-                                  task.isCompleted = value ?? false;
-                                });
-                              },
-                            ),
-                          ),
+                        return TaskCard(
+                          tittle: task.title,
+                          isCompleted: task.isCompleted,
+                          onDelete: () => removeTask(index),
+                          onCheckboxChanged: (value) {
+                            setState(() {
+                              task.isCompleted = value ?? false;
+                            });
+                          },
                         );
                       },
                       itemCount: tasks.length,

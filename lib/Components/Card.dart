@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
 
-class Card extends StatefulWidget {
-  const Card({super.key});
+class TaskCard extends StatefulWidget {
+  final String tittle;
+  final VoidCallback onDelete;
+  final bool isCompleted;
+  final ValueChanged<bool?>? onCheckboxChanged;
+
+  const TaskCard({
+    super.key,
+    required this.tittle,
+    required this.onDelete,
+    required this.isCompleted,
+    this.onCheckboxChanged,
+  });
 
   @override
-  State<Card> createState() => _CardState();
+  State<TaskCard> createState() => _TaskCardState();
 }
 
-class _CardState extends State<Card> {
+class _TaskCardState extends State<TaskCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(4.0),
       child: Container(
         height: 60,
         width: double.infinity,
@@ -23,23 +34,16 @@ class _CardState extends State<Card> {
           children: [
             Padding(padding: EdgeInsets.all(6.0)),
             Checkbox(
-              value: false,
-              onChanged: (value) {
-                // Handle checkbox state change
-              },
+              value: widget.isCompleted,
+              onChanged: widget.onCheckboxChanged,
             ),
             SizedBox(width: 16),
             Text(
-              'Task Title',
+              widget.tittle,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             Spacer(),
-            IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                // Handle delete action
-              },
-            ),
+            IconButton(icon: Icon(Icons.delete), onPressed: widget.onDelete),
           ],
         ),
       ),
