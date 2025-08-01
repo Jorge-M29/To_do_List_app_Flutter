@@ -40,10 +40,24 @@ class _TaskCardState extends State<TaskCard> {
             SizedBox(width: 16),
             Text(
               widget.tittle,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                decoration: widget.isCompleted
+                    ? TextDecoration.lineThrough
+                    : null,
+                color: widget.isCompleted ? Colors.grey : Colors.black,
+              ),
             ),
             Spacer(),
-            IconButton(icon: Icon(Icons.delete), onPressed: widget.onDelete),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: widget.onDelete,
+                color: Colors.red,
+              ),
+            ),
           ],
         ),
       ),

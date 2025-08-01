@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do_list_app/Components/Card.dart';
 import 'package:to_do_list_app/Components/taks.dart';
 
@@ -13,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Taks> tasks = [];
   final TextEditingController _Controller = TextEditingController();
 
-  void _addTask() {
+  Future<void> _addTask() async {
     final text = _Controller.text.trim();
     if (text.isNotEmpty) {
       setState(() {
@@ -21,12 +24,59 @@ class _HomeScreenState extends State<HomeScreen> {
         _Controller.clear();
       });
     }
+    await _saveTasks(); //Para guardar la tarea al agregarla
   }
 
-  void removeTask(int index) {
+  Future<void> removeTask(int index) async {
     setState(() {
       tasks.removeAt(index);
     });
+    await _saveTasks(); //Para guardar la lista de tareas al eliminar una
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTasks();
+  }
+
+  //Cargar las tareas desde SharedPreferences
+  Future<void> _loadTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? tasksJson = prefs.getString('tasks');
+    if (tasksJson != null) {
+      final List<dynamic> taksList = json.decode(tasksJson);
+      setState(() {
+        tasks = taksList.map((task) => Taks.fromJson(task)).toList();
+      });
+    }
+  }
+
+  //Guardar las tareas en SharedPreferences
+  Future<void> _saveTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String tasksJson = json.encode(
+      tasks.map((task) => task.toJson()).toList(),
+    );
+    await prefs.setString('tasks', tasksJson);
+  }
+
+  //Para actualizar el estado de la tarea al marcarla como completada
+  Future<void> _updateTaskCompletion(int index, bool? value) async {
+    setState(() {
+      tasks[index].isCompleted = value ?? false;
+
+      //Reordenar la lista de tareas para que las completadas vayan al final
+      tasks.sort((a, b) {
+        if (a.isCompleted && !b.isCompleted) {
+          return 1; // a va después de b
+        } else if (!a.isCompleted && b.isCompleted) {
+          return -1; // a va antes de b
+        }
+        return 0; // mantienen el orden actual
+      });
+    });
+    await _saveTasks(); //Guardar el estado actualizado de la tarea
   }
 
   @override
@@ -60,9 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           isCompleted: task.isCompleted,
                           onDelete: () => removeTask(index),
                           onCheckboxChanged: (value) {
-                            setState(() {
-                              task.isCompleted = value ?? false;
-                            });
+                            _updateTaskCompletion(index, value ?? false);
                           },
                         );
                       },
