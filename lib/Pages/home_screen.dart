@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do_list_app/Components/Card.dart';
 import 'package:to_do_list_app/Components/taks.dart';
+import 'package:to_do_list_app/Pages/edit_tasks_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,14 +14,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Taks> tasks = [];
+  List<Task> tasks = [];
   final TextEditingController _Controller = TextEditingController();
 
   Future<void> _addTask() async {
     final text = _Controller.text.trim();
     if (text.isNotEmpty) {
       setState(() {
-        tasks.add(Taks(title: text, description: ''));
+        tasks.add(Task(title: text, description: ''));
         _Controller.clear();
       });
     }
@@ -45,9 +46,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     final String? tasksJson = prefs.getString('tasks');
     if (tasksJson != null) {
-      final List<dynamic> taksList = json.decode(tasksJson);
+      final List<dynamic> TaskList = json.decode(tasksJson);
       setState(() {
-        tasks = taksList.map((task) => Taks.fromJson(task)).toList();
+        tasks = TaskList.map((task) => Task.fromJson(task)).toList();
       });
     }
   }
@@ -105,13 +106,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   : ListView.builder(
                       itemBuilder: (context, index) {
                         final task = tasks[index];
-                        return TaskCard(
-                          tittle: task.title,
-                          isCompleted: task.isCompleted,
-                          onDelete: () => removeTask(index),
-                          onCheckboxChanged: (value) {
-                            _updateTaskCompletion(index, value ?? false);
+                        //Navegación hacia la card
+                        return GestureDetector(
+                          onTap: () {
+                            navigation_and_animation(context, task);
                           },
+                          //Card para mostrar la tarea
+                          child: TaskCard(
+                            tittle: task.title,
+                            isCompleted: task.isCompleted,
+                            onDelete: () => removeTask(index),
+                            onCheckboxChanged: (value) {
+                              _updateTaskCompletion(index, value ?? false);
+                            },
+                          ),
                         );
                       },
                       itemCount: tasks.length,
@@ -121,6 +129,32 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void navigation_and_animation(BuildContext context, Task task) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            EditTaskScreen(task: task),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+
+          var tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+        transitionDuration: Duration(milliseconds: 400),
       ),
     );
   }

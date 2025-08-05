@@ -1,9 +1,9 @@
-class Taks {
+class Task {
   String title;
   String description;
   bool isCompleted;
 
-  Taks({
+  Task({
     required this.title,
     required this.description,
     this.isCompleted = false,
@@ -19,8 +19,8 @@ class Taks {
   }
 
   //Crear desde Map al cargar
-  factory Taks.fromJson(Map<String, dynamic> json) {
-    return Taks(
+  factory Task.fromJson(Map<String, dynamic> json) {
+    return Task(
       title: json['title'],
       description: json['description'],
       isCompleted: json['isCompleted'] ?? false,
