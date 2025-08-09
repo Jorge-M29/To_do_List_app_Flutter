@@ -11,6 +11,53 @@ class EditTaskScreen extends StatefulWidget {
 }
 
 class _EditTaskScreenState extends State<EditTaskScreen> {
+  late TextEditingController _titleController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.task.title);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
+  void _showEditDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit Task'),
+          content: TextField(
+            controller: _titleController,
+            decoration: InputDecoration(labelText: 'Task Title'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                final newTitle = _titleController.text.trim();
+                if (newTitle.isNotEmpty) {
+                  Navigator.of(context).pop(newTitle);
+                }
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    ).then((newTitle) {
+      if (newTitle != null && newTitle.isNotEmpty) {
+        setState(() {
+          widget.task.title = newTitle;
+        });
+        Navigator.pop(context, widget.task);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +69,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
           IconButton(
             icon: Icon(Icons.edit),
             onPressed: () {
-              // Aquí puedes agregar la lógica para editar la tarea
+              _showEditDialog();
             },
           ),
         ],

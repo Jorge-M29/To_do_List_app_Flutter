@@ -109,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         //Navegación hacia la card
                         return GestureDetector(
                           onTap: () {
-                            navigation_and_animation(context, task);
+                            navigation_and_animation(context, task, index);
                           },
                           //Card para mostrar la tarea
                           child: TaskCard(
@@ -133,8 +133,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void navigation_and_animation(BuildContext context, Task task) {
-    Navigator.push(
+  Future<void> navigation_and_animation(
+    BuildContext context,
+    Task task,
+    int index,
+  ) async {
+    final updatedTask = await Navigator.push(
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
@@ -157,5 +161,12 @@ class _HomeScreenState extends State<HomeScreen> {
         transitionDuration: Duration(milliseconds: 400),
       ),
     );
+
+    if (updatedTask != null) {
+      setState(() {
+        tasks[index] = updatedTask;
+      });
+      await _saveTasks(); //Guardar la tarea actualizada
+    }
   }
 }
